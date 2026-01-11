@@ -1,9 +1,9 @@
 const game = document.getElementById("game");
 const player = document.getElementById("player");
 
-// Player position & velocity
-let playerX = 10, playerY = 350;
-let velX = 0, velY = 0;
+// Player
+let px = 10, py = 350;
+let vx = 0, vy = 0;
 let speed = 5, jumpPower = -15;
 let onGround = false;
 
@@ -42,7 +42,7 @@ document.addEventListener("keyup", e=>{
     if(e.key==="ArrowUp") jump = false;
 });
 
-// Mobile buttons
+// Mobile
 document.getElementById("leftBtn").addEventListener("touchstart",()=>left=true);
 document.getElementById("leftBtn").addEventListener("touchend",()=>left=false);
 document.getElementById("rightBtn").addEventListener("touchstart",()=>right=true);
@@ -51,53 +51,50 @@ document.getElementById("jumpBtn").addEventListener("touchstart",()=>jump=true);
 document.getElementById("jumpBtn").addEventListener("touchend",()=>jump=false);
 
 // Game loop
-function update(){
-    // Horizontal
-    velX = 0;
-    if(left) velX = -speed;
-    if(right) velX = speed;
+function update() {
+    // Horizontal movement
+    vx = 0;
+    if(left) vx = -speed;
+    if(right) vx = speed;
 
     // Gravity
-    velY += 0.8;
+    vy += 0.8;
 
-    // Move
-    playerX += velX;
-    playerY += velY;
+    // Apply movement
+    px += vx;
+    py += vy;
 
-    // Collision detection with tolerance
+    // Platform collision (with 5px tolerance)
     onGround = false;
     platforms.forEach(p=>{
-        const playerBottom = playerY + 30;
+        const playerBottom = py + 30;
         const platformTop = p.y;
         const platformBottom = p.y + 20;
 
-        // Check if player is on top of platform (with 5px tolerance)
-        if(playerX + 30 > p.x && playerX < p.x + p.w &&
+        if(px + 30 > p.x && px < p.x + p.w &&
            playerBottom >= platformTop && playerBottom <= platformTop + 5 &&
-           velY >= 0){
-            playerY = platformTop - 30;
-            velY = 0;
+           vy >= 0){
+            py = platformTop - 30;
+            vy = 0;
             onGround = true;
         }
     });
 
-    // Jump if on ground
+    // Jump
     if(jump && onGround){
-        velY = jumpPower;
+        vy = jumpPower;
         onGround = false;
     }
 
-    // Fall reset
-    if(playerY > 400){
-        playerX = 10;
-        playerY = 350;
-        velX = 0;
-        velY = 0;
+    // Reset if fall
+    if(py > 400){
+        px = 10; py = 350;
+        vx = 0; vy = 0;
     }
 
     // Apply position
-    player.style.left = playerX + "px";
-    player.style.top = playerY + "px";
+    player.style.left = px + "px";
+    player.style.top = py + "px";
 
     requestAnimationFrame(update);
 }
