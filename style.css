@@ -1,0 +1,89 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+    background: linear-gradient(to top, #87ceeb, #f0f8ff);
+    text-align: center;
+    user-select: none;
+}
+
+#game {
+    position: relative;
+    width: 600px;
+    height: 400px;
+    margin: auto;
+    background: #cce7ff;
+    overflow: hidden;
+    border: 3px solid #000;
+    touch-action: none; /* for mobile */
+}
+
+.player {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: red;
+    left: 10px;
+    top: 350px;
+    border-radius: 5px;
+}
+
+.platform {
+    position: absolute;
+    height: 20px;
+    background: green;
+    border-radius: 4px;
+}
+
+.moving {
+    background: orange;
+}
+
+.disappear {
+    background: purple;
+}
+
+.coin {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background: gold;
+    border-radius: 50%;
+}
+
+.checkpoint {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: gold;
+    border-radius: 50%;
+}
+
+#coins {
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+#controls {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+#controls button {
+    width: 60px;
+    height: 60px;
+    font-size: 30px;
+    border-radius: 10px;
+    border: none;
+    background: #555;
+    color: white;
+    opacity: 0.7;
+    touch-action: none;
+}
+
+#controls button:active {
+    background: #333;
+    opacity: 1;
+}
