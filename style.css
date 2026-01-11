@@ -1,9 +1,7 @@
 body {
     margin: 0;
     font-family: sans-serif;
-    background: linear-gradient(to top, #87ceeb, #f0f8ff);
     text-align: center;
-    user-select: none;
 }
 
 #game {
@@ -24,47 +22,12 @@ body {
     background: red;
     left: 10px;
     top: 350px;
-    border-radius: 5px;
-    transition: transform 0.1s;
 }
 
 .platform {
     position: absolute;
     height: 20px;
     background: green;
-    border-radius: 4px;
-}
-
-.moving {
-    background: orange;
-}
-
-.disappear {
-    background: purple;
-}
-
-.coin {
-    position: absolute;
-    width: 15px;
-    height: 15px;
-    background: gold;
-    border-radius: 50%;
-    transition: transform 0.2s;
-}
-
-.checkpoint {
-    position: absolute;
-    width: 30px;
-    height: 30px;
-    background: gold;
-    border-radius: 50%;
-    animation: spin 2s linear infinite;
-}
-
-#coins {
-    margin-top: 10px;
-    font-weight: bold;
-    font-size: 16px;
 }
 
 #controls {
@@ -78,33 +41,4 @@ body {
     width: 60px;
     height: 60px;
     font-size: 30px;
-    border-radius: 10px;
-    border: none;
-    background: #555;
-    color: white;
-    opacity: 0.7;
-    touch-action: none;
-}
-
-#controls button:active {
-    background: #333;
-    opacity: 1;
-}
-
-#message {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    top: 50%;
-    font-size: 28px;
-    font-weight: bold;
-    color: yellow;
-    text-shadow: 2px 2px 5px black;
-    pointer-events: none;
-    display: none;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg);}
-    100% { transform: rotate(360deg);}
 }
