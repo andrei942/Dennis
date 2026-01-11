@@ -3,18 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dennis Cole Obby</title>
-<link rel="stylesheet" href="style.css">
+<title>Red Cube Jump Fix</title>
+<style>
+body { margin:0; font-family:sans-serif; text-align:center; }
+#game {
+    position: relative;
+    width: 400px;
+    height: 300px;
+    margin: auto;
+    background: #cce7ff;
+    border: 3px solid black;
+    overflow: hidden;
+    touch-action: none;
+}
+#player {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: red;
+    left: 10px;
+    top: 250px;
+}
+.platform {
+    position: absolute;
+    width: 100px;
+    height: 20px;
+    background: green;
+    border-radius: 4px;
+}
+#controls { display:flex; justify-content:center; gap:10px; margin-top:10px; }
+#controls button { width:50px; height:50px; font-size:24px; }
+</style>
 </head>
 <body>
 
-<h1>Dennis Cole</h1>
+<h2>Red Cube Jump Fix</h2>
+
 <div id="game">
     <div id="player"></div>
-    <div id="message"></div>
+    <div class="platform" style="left:50px; top:250px;"></div>
+    <div class="platform" style="left:200px; top:200px;"></div>
 </div>
-
-<div id="coins">Coins: 0</div>
 
 <div id="controls">
     <button id="leftBtn">◀</button>
@@ -22,6 +51,88 @@
     <button id="rightBtn">▶</button>
 </div>
 
-<script src="script.js"></script>
+<script>
+const player = document.getElementById('player');
+const game = document.getElementById('game');
+const platforms = Array.from(document.querySelectorAll('.platform'));
+
+// Player state
+let px = 10, py = 250, vx = 0, vy = 0;
+let speed = 4, jumpPower = -18; // stronger jump
+let gravity = 0.8; // lighter gravity for better jump
+let left = false, right = false, jumpFlag = false;
+let onGround = false;
+
+// Keyboard controls
+document.addEventListener('keydown', e=>{
+    if(e.key==='ArrowLeft') left=true;
+    if(e.key==='ArrowRight') right=true;
+    if(e.key==='ArrowUp') jumpFlag=true;
+});
+document.addEventListener('keyup', e=>{
+    if(e.key==='ArrowLeft') left=false;
+    if(e.key==='ArrowRight') right=false;
+    if(e.key==='ArrowUp') jumpFlag=false;
+});
+
+// Mobile controls
+['leftBtn','rightBtn','jumpBtn'].forEach(id=>{
+    const btn = document.getElementById(id);
+    btn.addEventListener('touchstart', e=>{ e.preventDefault(); if(id==='leftBtn') left=true; if(id==='rightBtn') right=true; if(id==='jumpBtn') jumpFlag=true; }, {passive:false});
+    btn.addEventListener('touchend', e=>{ e.preventDefault(); if(id==='leftBtn') left=false; if(id==='rightBtn') right=false; if(id==='jumpBtn') jumpFlag=false; }, {passive:false});
+});
+
+// Game loop
+function update(){
+    // Horizontal
+    vx = 0;
+    if(left) vx = -speed;
+    if(right) vx = speed;
+
+    // Gravity
+    vy += gravity;
+
+    // Move player
+    px += vx;
+    py += vy;
+
+    // Collision
+    onGround = false;
+    platforms.forEach(p=>{
+        const rect = p.getBoundingClientRect();
+        const platX = rect.left - game.getBoundingClientRect().left;
+        const platY = rect.top - game.getBoundingClientRect().top;
+        const platW = rect.width;
+        const platH = rect.height;
+        const playerBottom = py + 30;
+
+        if(px + 30 > platX && px < platX + platW &&
+           playerBottom >= platY && playerBottom <= platY + 12 && // 12px tolerance
+           vy >= 0){
+            py = platY - 30;
+            vy = 0;
+            onGround = true;
+        }
+    });
+
+    // Jump
+    if(jumpFlag && onGround){
+        vy = jumpPower;
+        onGround = false;
+    }
+
+    // Fall reset
+    if(py > 300){ px=10; py=250; vx=0; vy=0; }
+
+    // Apply position
+    player.style.left = px+'px';
+    player.style.top = py+'px';
+
+    requestAnimationFrame(update);
+}
+
+update();
+</script>
+
 </body>
 </html>
