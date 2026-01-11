@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Red Cube Multi-Touch Jump</title>
+<title>Red Cube Working</title>
 <style>
 body { margin:0; font-family:sans-serif; text-align:center; }
 #game {
@@ -32,12 +32,12 @@ body { margin:0; font-family:sans-serif; text-align:center; }
   border-radius: 4px;
 }
 #controls { display:flex; justify-content:center; gap:10px; margin-top:10px; }
-#controls button { width:50px; height:50px; font-size:24px; user-select:none; }
+#controls button { width:50px; height:50px; font-size:24px; }
 </style>
 </head>
 <body>
 
-<h2>Red Cube Multi-Touch Jump</h2>
+<h2>Red Cube Working</h2>
 
 <div id="game">
   <div id="player"></div>
@@ -65,80 +65,66 @@ const gravity = 0.7;
 let onGround = false;
 
 // Input flags
-let leftPressed=false, rightPressed=false, jumpPressed=false;
+let moveLeft=false, moveRight=false, jump=false;
 
-// Platform coordinates
-let platData = platforms.map(p => ({
+// Platform data
+let platData = platforms.map(p=>({
   x: parseInt(p.style.left),
   y: parseInt(p.style.top),
   w: parseInt(p.style.width),
   h: parseInt(p.style.height)
 }));
 
-// Keyboard input
+// Keyboard controls
 document.addEventListener('keydown', e=>{
-  if(e.key==='ArrowLeft') leftPressed=true;
-  if(e.key==='ArrowRight') rightPressed=true;
-  if(e.key==='ArrowUp') jumpPressed=true;
+  if(e.key==='ArrowLeft') moveLeft=true;
+  if(e.key==='ArrowRight') moveRight=true;
+  if(e.key==='ArrowUp') jump=true;
 });
 document.addEventListener('keyup', e=>{
-  if(e.key==='ArrowLeft') leftPressed=false;
-  if(e.key==='ArrowRight') rightPressed=false;
-  if(e.key==='ArrowUp') jumpPressed=false;
+  if(e.key==='ArrowLeft') moveLeft=false;
+  if(e.key==='ArrowRight') moveRight=false;
+  if(e.key==='ArrowUp') jump=false;
 });
 
-// Mobile input
-[['leftBtn','leftPressed'],['rightBtn','rightPressed'],['jumpBtn','jumpPressed']].forEach(([id,flag])=>{
-  const btn = document.getElementById(id);
-  btn.addEventListener('touchstart', e=>{
-    e.preventDefault();
-    if(flag==='leftPressed') leftPressed=true;
-    if(flag==='rightPressed') rightPressed=true;
-    if(flag==='jumpPressed') jumpPressed=true;
-  }, {passive:false});
-  btn.addEventListener('touchend', e=>{
-    e.preventDefault();
-    if(flag==='leftPressed') leftPressed=false;
-    if(flag==='rightPressed') rightPressed=false;
-    if(flag==='jumpPressed') jumpPressed=false;
-  }, {passive:false});
+// Mobile controls (single-touch)
+document.getElementById('leftBtn').addEventListener('click', ()=>{ px-=speed; });
+document.getElementById('rightBtn').addEventListener('click', ()=>{ px+=speed; });
+document.getElementById('jumpBtn').addEventListener('click', ()=>{
+  if(onGround) vy = jumpPower;
 });
 
 // Game loop
 function update(){
   // Horizontal movement
-  vx=0;
-  if(leftPressed) vx=-speed;
-  if(rightPressed) vx=speed;
+  if(moveLeft) px -= speed;
+  if(moveRight) px += speed;
 
   // Gravity
   vy += gravity;
-
-  // Apply movement
-  px += vx;
   py += vy;
 
-  // Collision detection
-  onGround = false;
-  platData.forEach(p => {
+  // Collision
+  onGround=false;
+  platData.forEach(p=>{
     const playerBottom = py + 30;
-    if(px + 30 > p.x && px < p.x + p.w &&
-       playerBottom >= p.y && playerBottom <= p.y + 12 &&
-       vy >= 0){
+    if(px+30>p.x && px<p.x+p.w &&
+       playerBottom>=p.y && playerBottom<=p.y+12 &&
+       vy>=0){
       py = p.y - 30;
-      vy = 0;
-      onGround = true;
+      vy=0;
+      onGround=true;
     }
   });
 
-  // Jump if on ground
-  if(jumpPressed && onGround){
+  // Jump
+  if(jump && onGround){
     vy = jumpPower;
-    onGround = false;
+    onGround=false;
   }
 
   // Fall reset
-  if(py > 300){ px=10; py=250; vx=0; vy=0; }
+  if(py>300){ px=10; py=250; vy=0; }
 
   // Update position
   player.style.left = px+'px';
