@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Red Cube Fully Functional</title>
+<title>Red Cube Multi-Touch Jump</title>
 <style>
 body { margin:0; font-family:sans-serif; text-align:center; }
 #game {
@@ -37,11 +37,10 @@ body { margin:0; font-family:sans-serif; text-align:center; }
 </head>
 <body>
 
-<h2>Red Cube Fully Functional</h2>
+<h2>Red Cube Multi-Touch Jump</h2>
 
 <div id="game">
   <div id="player"></div>
-  <!-- Platforms -->
   <div class="platform" style="left:50px; top:250px;"></div>
   <div class="platform" style="left:150px; top:200px;"></div>
   <div class="platform" style="left:250px; top:150px;"></div>
@@ -63,10 +62,12 @@ let vx = 0, vy = 0;
 const speed = 4;
 const jumpPower = -16;
 const gravity = 0.7;
-let left = false, right = false, jumpFlag = false;
 let onGround = false;
 
-// Platform coordinates (absolute numbers)
+// Input flags
+let leftPressed=false, rightPressed=false, jumpPressed=false;
+
+// Platform coordinates
 let platData = platforms.map(p => ({
   x: parseInt(p.style.left),
   y: parseInt(p.style.top),
@@ -74,31 +75,41 @@ let platData = platforms.map(p => ({
   h: parseInt(p.style.height)
 }));
 
-// Keyboard controls
+// Keyboard input
 document.addEventListener('keydown', e=>{
-  if(e.key==='ArrowLeft') left=true;
-  if(e.key==='ArrowRight') right=true;
-  if(e.key==='ArrowUp') jumpFlag=true;
+  if(e.key==='ArrowLeft') leftPressed=true;
+  if(e.key==='ArrowRight') rightPressed=true;
+  if(e.key==='ArrowUp') jumpPressed=true;
 });
 document.addEventListener('keyup', e=>{
-  if(e.key==='ArrowLeft') left=false;
-  if(e.key==='ArrowRight') right=false;
-  if(e.key==='ArrowUp') jumpFlag=false;
+  if(e.key==='ArrowLeft') leftPressed=false;
+  if(e.key==='ArrowRight') rightPressed=false;
+  if(e.key==='ArrowUp') jumpPressed=false;
 });
 
-// Mobile controls
-['leftBtn','rightBtn','jumpBtn'].forEach(id=>{
+// Mobile input
+[['leftBtn','leftPressed'],['rightBtn','rightPressed'],['jumpBtn','jumpPressed']].forEach(([id,flag])=>{
   const btn = document.getElementById(id);
-  btn.addEventListener('touchstart', e=>{ e.preventDefault(); if(id==='leftBtn') left=true; if(id==='rightBtn') right=true; if(id==='jumpBtn') jumpFlag=true; }, {passive:false});
-  btn.addEventListener('touchend', e=>{ e.preventDefault(); if(id==='leftBtn') left=false; if(id==='rightBtn') right=false; if(id==='jumpBtn') jumpFlag=false; }, {passive:false});
+  btn.addEventListener('touchstart', e=>{
+    e.preventDefault();
+    if(flag==='leftPressed') leftPressed=true;
+    if(flag==='rightPressed') rightPressed=true;
+    if(flag==='jumpPressed') jumpPressed=true;
+  }, {passive:false});
+  btn.addEventListener('touchend', e=>{
+    e.preventDefault();
+    if(flag==='leftPressed') leftPressed=false;
+    if(flag==='rightPressed') rightPressed=false;
+    if(flag==='jumpPressed') jumpPressed=false;
+  }, {passive:false});
 });
 
 // Game loop
 function update(){
   // Horizontal movement
-  vx = 0;
-  if(left) vx = -speed;
-  if(right) vx = speed;
+  vx=0;
+  if(leftPressed) vx=-speed;
+  if(rightPressed) vx=speed;
 
   // Gravity
   vy += gravity;
@@ -113,28 +124,23 @@ function update(){
     const playerBottom = py + 30;
     if(px + 30 > p.x && px < p.x + p.w &&
        playerBottom >= p.y && playerBottom <= p.y + 12 &&
-       vy >=0){
+       vy >= 0){
       py = p.y - 30;
       vy = 0;
       onGround = true;
     }
   });
 
-  // Jump
-  if(jumpFlag && onGround){
+  // Jump if on ground
+  if(jumpPressed && onGround){
     vy = jumpPower;
     onGround = false;
   }
 
   // Fall reset
-  if(py > 300){
-    px = 10;
-    py = 250;
-    vx = 0;
-    vy = 0;
-  }
+  if(py > 300){ px=10; py=250; vx=0; vy=0; }
 
-  // Update player position
+  // Update position
   player.style.left = px+'px';
   player.style.top = py+'px';
 
